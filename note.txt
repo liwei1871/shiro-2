@@ -1,0 +1,44 @@
+2. 认证:
+1). 编写 login.jsp 的登录表单页面.
+2). 编写 SpringMVC 的目标 Handler. 可以受理请求.
+3). 执行 shiro 的登录逻辑:
+
+// 获取当前 User: 调用了 SecurityUtils.getSubject() 方法. 
+Subject currentUser = SecurityUtils.getSubject();
+
+// 检测用户是否已经被认证. 即用户是否登录. 调用 Subject 的 isAuthenticated()
+if (!currentUser.isAuthenticated()) {
+	// 把用户名和密码封装为一个 UsernamePasswordToken 对象. 
+    UsernamePasswordToken token = new UsernamePasswordToken("lonestarr", "vespa");
+    token.setRememberMe(true);
+    try {
+    	// 执行登录. 调用 Subject 的 login(UsernamePasswordToken) 方法.
+        currentUser.login(token);
+    } 
+    // 认证时的异常. 所有的认证时的异常的父类. 
+    catch (AuthenticationException ae) {
+        //unexpected condition?  error?
+    }
+}
+
+4). 实现 AuthorizingRealm 的 doGetAuthenticationInfo 方法. 
+
+1. shiro 整合 Spring
+1). 加入 Spring 和 SpringMVC.
+2). 加入 shiro 的 jar 包
+3). Spring 和 shiro 进行整合 .
+①. 参考 shiro-root-1.2.2\samples\spring\src\main\webapp\WEB-INF\applicationContext.xml 文件
+②. 在 web.xml 文件中配置 shiro 的 Filter! 复制 shiro-root-1.2.2\samples\spring\src\main\webapp\WEB-INF\web.xml 中的 shiroFilter 配置
+<filter>
+    <filter-name>shiroFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    <init-param>
+        <param-name>targetFilterLifecycle</param-name>
+        <param-value>true</param-value>
+    </init-param>
+</filter>
+
+<filter-mapping>
+    <filter-name>shiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
